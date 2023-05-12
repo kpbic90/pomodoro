@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "PomodoroService": {
+      "commandName": "Project"
+    },
+    "Docker": {
+      "commandName": "Docker"
+    }
+  }
+}
