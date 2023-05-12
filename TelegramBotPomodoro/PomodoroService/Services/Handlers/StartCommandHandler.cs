@@ -31,7 +31,7 @@ namespace PomodoroService.Services.Handlers
                 {
                     new AnswerKeyboardButton
                     {
-                        Text = "Sponsor us"
+                        Text = "Sponsor us", CallbackData = "https://kpbic90.github.io/pomodoro/WebApp/links.html"
                     }
                 }
             };

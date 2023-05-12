@@ -18,112 +18,30 @@
         Telegram.WebApp.onEvent('themeChanged', setThemeClass);
         setThemeClass();
     </script>    
+	<style>
+		.link {
+			color:blue;
+			text-decoration:underline;
+			cursor:pointer;
+		}
+	</style>
 </head>
 
 <body>
 
-<section>
     <p>Sponsor links:</p>
-    <ul>
-		<li><a href="javascript:;" onclick="return DemoApp.GoLink('https://boosty.to/kpbic');">Boosty</a> <span></span></li>
-    </ul>
-
-
-</section>
-<div class="viewport-border"></div>
-<div class="viewport-stable_border"></div>
+	<span class="link" onclick="javascript:GoLink('https://boosty.to/kpbic');">Boosty</span>
 
 <script type="application/javascript">
-
-    /*
-     * This is a demo code for Telegram WebApp for Bots
-     * It contains basic examples of how to use the API
-     * Note: all requests to backend are disabled in this demo, you should use your own backend
-     */
-
-    const DemoApp = {
-        initData: Telegram.WebApp.initData || '',
-        initDataUnsafe: Telegram.WebApp.initDataUnsafe || {},
-        MainButton: Telegram.WebApp.MainButton,
-
-        init(options) {
-            document.body.style.visibility = '';
-            Telegram.WebApp.ready();
-            Telegram.WebApp.MainButton.setParams({
-                text: 'CLOSE WEBVIEW',
-                is_visible: true
-            }).onClick(DemoApp.close);
-        },
-        close() {
-            Telegram.WebApp.close();
-        },
-		GoLink: function(link) {
-			if(IsMobile()) {
-				window.open(link,"_self");
-			} else {
-				window.open(link,"_blank")
-			}
+    function GoLink(link) {
+		if(IsMobile()) {
+			window.open(link,"_self");
+		} else {
+			window.open(link,"_blank")
 		}
-    }
-
-    const DemoAppMenu = {
-        init() {
-            DemoApp.init();
-            document.body.classList.add('gray');
-            Telegram.WebApp.setHeaderColor('secondary_bg_color');
-        }
-    };
-
-    const DemoAppInitData = {
-        init() {
-            DemoApp.init();
-            Telegram.WebApp.onEvent('themeChanged', function() {
-                document.getElementById('theme_data').innerHTML = JSON.stringify(Telegram.WebApp.themeParams, null, 2);
-            });
-            document.getElementById('webview_data').innerHTML = JSON.stringify(DemoApp.initDataUnsafe, null, 2);
-            document.getElementById('theme_data').innerHTML = JSON.stringify(Telegram.WebApp.themeParams, null, 2);
-            DemoApp.checkInitData();
-        }
-    };
-
-    const DemoAppViewport = {
-        init() {
-            DemoApp.init();
-            Telegram.WebApp.onEvent('viewportChanged', DemoAppViewport.setData);
-            DemoAppViewport.setData();
-        },
-        setData() {
-            document.querySelector('.viewport-border')
-                .setAttribute('text', window.innerWidth + ' x ' + round(Telegram.WebApp.viewportHeight, 2))
-            document.querySelector('.viewport-stable_border')
-                .setAttribute('text', window.innerWidth + ' x ' + round(Telegram.WebApp.viewportStableHeight, 2) +
-                    ' | is_expanded: ' + (Telegram.WebApp.isExpanded ? 'true' : 'false'));
-        }
-    };
-
-    function byteLength(str) {
-        if (window.Blob) {
-            try { return new Blob([str]).size; } catch (e) {}
-        }
-
-        let s = str.length;
-        for (let i = str.length - 1; i >= 0; i--) {
-            const code = str.charCodeAt(i);
-            if (code > 0x7f && code <= 0x7ff) {
-                s++;
-            } else if (code > 0x7ff && code <= 0xffff) {
-                s+=2;
-            }
-
-            if (code >= 0xDC00 && code <= 0xDFFF) {
-                i--;
-            }
-        }
-        return s;
-    }
+	}    
 
 	function IsMobile() {
-		//alert(typeof screen.orientation);
 		const toMatch = [
 			/Android/i,
 			/webOS/i,

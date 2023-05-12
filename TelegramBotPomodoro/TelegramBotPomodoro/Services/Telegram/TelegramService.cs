@@ -69,9 +69,12 @@ namespace TelegramBotPomodoro.Services.Telegram
                     foreach (var item in irow)
                     {
                         var button = new KeyboardButton(item.Text);
-                        WebAppInfo webAppInfo = new WebAppInfo();
-                        webAppInfo.Url = "https://kpbic90.github.io/pomodoro/WebApp/links.html";
-                        button.WebApp = webAppInfo;
+                        if (!string.IsNullOrEmpty(item.CallbackData))
+                        {
+                            var webAppInfo = new WebAppInfo();
+                            webAppInfo.Url = item.CallbackData;
+                            button.WebApp = webAppInfo;
+                        }
                         row.Add(button);
                     }
                     rows.Add(row);
