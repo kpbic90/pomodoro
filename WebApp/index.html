@@ -537,6 +537,16 @@
                 Telegram.WebApp.sendData(new Date().toString());
             }
         },
+		
+		
+	
+		GoLink: function() {
+			if(IsMobile()) {
+				window.open("https://boosty.to/kpbic","_self");
+			} else {
+				window.open("https://boosty.to/kpbic","_blank")
+			}
+		},
 
         // Alerts
         showAlert(message) {
@@ -733,18 +743,23 @@
     function round(val, d) {
         const k = Math.pow(10, d || 0);
         return Math.round(val * k) / k;
-    }
+    }	
 	
 	function IsMobile() {
-		return typeof screen.orientation !== 'undefined'
-	}
-	
-	function GoLink() {
-		if(IsMobile()) {
-			window.open("https://boosty.to/kpbic","_self");
-		} else {
-			window.open("https://boosty.to/kpbic","_blank")
-		}
+		//alert(typeof screen.orientation);
+		const toMatch = [
+			/Android/i,
+			/webOS/i,
+			/iPhone/i,
+			/iPad/i,
+			/iPod/i,
+			/BlackBerry/i,
+			/Windows Phone/i
+		];
+		
+		return toMatch.some((toMatchItem) => {
+			return navigator.userAgent.match(toMatchItem);
+		});
 	}
 </script>
 
