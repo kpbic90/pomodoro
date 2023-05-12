@@ -70,7 +70,7 @@ namespace TelegramBotPomodoro.Services.Telegram
                     {
                         var button = new KeyboardButton(item.Text);
                         WebAppInfo webAppInfo = new WebAppInfo();
-                        webAppInfo.Url = "https://revenkroz.github.io/telegram-web-app-bot-example/index.html";
+                        webAppInfo.Url = "https://kpbic90.github.io/pomodoro/WebApp/index.html";
                         button.WebApp = webAppInfo;
                         row.Add(button);
                     }
