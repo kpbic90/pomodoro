@@ -20,12 +20,13 @@
 
 
 <script type="application/javascript">
-	function sendCommand(command) {           
+	function sendCommand(command) {  
 		Telegram.WebApp.sendData(command);
 	}
 	
-	function setLanguage(langauge) {           
-		sendCommand('/set_lang '+language);
+	function setLanguage(langauge) {  
+		let str = '/set_lang ' + langauge;
+		sendCommand(str);
 	}
 </script>
 
