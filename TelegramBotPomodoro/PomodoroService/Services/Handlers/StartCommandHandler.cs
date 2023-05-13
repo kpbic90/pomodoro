@@ -24,7 +24,7 @@ namespace PomodoroService.Services.Handlers
                 {
                     new AnswerKeyboardButton
                     {
-                        Text = "Settings"
+                        Text = "Settings", CallbackData = "https://kpbic90.github.io/pomodoro/WebApp/settings.html"
                     }
                 },
                 new List<AnswerKeyboardButton>

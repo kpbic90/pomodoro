@@ -132,7 +132,15 @@ namespace TelegramBotPomodoro.Services.Telegram
             switch (update.Type)
             {
                 case UpdateType.Message:
-                    await _publisher.Publish(new Shared.Models.Message { Id = update.Message?.MessageId, Text = update.Message?.Text, Author = update.Message.From.Id, Receiver = update.Message.Chat.Id }, cancellationToken);
+                    switch(update.Message.Type)
+                    {
+                        case MessageType.Text:
+                            await _publisher.Publish(new Shared.Models.Message { Id = update.Message?.MessageId, Text = update.Message?.Text, Author = update.Message.From.Id, Receiver = update.Message.Chat.Id }, cancellationToken);
+                            break;
+                        case MessageType.WebAppData:
+                            await _publisher.Publish(new Shared.Models.Message { Id = update.Message?.MessageId, Text = update.Message?.WebAppData?.Data, Author = update.Message.From.Id, Receiver = update.Message.Chat.Id }, cancellationToken);
+                            break;
+                    }
                     break;
                 case UpdateType.EditedMessage:
                     await _publisher.Publish(new Shared.Models.Message { Id = update.Message?.MessageId, Text = update.EditedMessage?.Text, Author = update.Message.From.Id, Receiver = update.Message.Chat.Id }, cancellationToken);
