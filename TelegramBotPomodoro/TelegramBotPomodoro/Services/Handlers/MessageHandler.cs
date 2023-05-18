@@ -1,9 +1,9 @@
 ﻿using MediatR;
-using Shared.Models;
+using Shared.Models.Requests;
 
 namespace TelegramBotPomodoro.Services.Handlers
 {
-    internal class MessageHandler : INotificationHandler<Message>
+    internal class MessageHandler : IRequestHandler<MessageHandleRequest, bool>
     {
         private readonly IMessageProccessor _messageProccessor;
 
@@ -12,10 +12,10 @@ namespace TelegramBotPomodoro.Services.Handlers
             _messageProccessor = messageProccessor;
         }
 
-        public Task Handle(Message message, CancellationToken cancellationToken)
+        public Task<bool> Handle(MessageHandleRequest request, CancellationToken cancellationToken)
         {
-            _messageProccessor.Proccess(message, cancellationToken);
-            return Task.CompletedTask;
+            _messageProccessor.Proccess(request.Message, cancellationToken);
+            return Task.FromResult(true);
         }
     }
 }

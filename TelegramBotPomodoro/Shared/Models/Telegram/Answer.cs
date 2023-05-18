@@ -3,7 +3,7 @@ using Shared.Enums.Telegram;
 
 namespace Shared.Models.Telegram
 {
-    public class Answer : INotification
+    public class Answer : IRequest<bool>
     {
         public AnswerType Type { get; set; }
         public int? EditMessageId { get; set; }

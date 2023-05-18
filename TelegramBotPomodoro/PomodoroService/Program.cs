@@ -10,6 +10,8 @@ using Shared.Services.Rabbit;
 using PomodoroService.Services;
 using Shared.Services.Telegram;
 using PomodoroService.Models;
+using Shared.Extensions;
+using TelegramCommon.Services.ButtonFactories;
 
 /* TODO:
  * Localization Project
@@ -19,6 +21,10 @@ using PomodoroService.Models;
  * Link to sponsorship
  * Report bug
  * 
+ * 
+ * 
+ * bugs: not allow to start many timers for one user
+ * user deletes timer message -> bot throws error
  */
 
 namespace PomodoroService
@@ -51,13 +57,18 @@ namespace PomodoroService
                     logging.AddNLog(LogManager.LoadConfiguration("NLog.config").Configuration))
                 .ConfigureServices((hostContext, services) =>
                 {
-                    services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
+                    services.AddLocalization(options => { options.ResourcesPath = "Resources"; });
+                    services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));                   
                     services.AddTransient<IConfig, Config>();
                     services.AddTransient<IPomodoroConfig, PomodoroConfig>();
                     services.AddSingleton<IMQService, RabbitMQService>();
                     services.AddTransient<IAnswerSender, AnswerSender>();
                     services.AddTransient<IIntervalController, IntervalController>();
                     services.AddSingleton<IRepository<WorkInterval>, WorkIntervalRepository>();
+                    foreach (var currentassembly in AppDomain.CurrentDomain.GetAssemblies())
+                    {
+                        services.RegisterAllTypes<IButtonFactory>(new[] { currentassembly });
+                    }                    
                     services.AddHostedService<Worker>();
                 });
         }

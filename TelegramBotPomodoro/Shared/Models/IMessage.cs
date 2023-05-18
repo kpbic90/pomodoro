@@ -2,7 +2,7 @@
 
 namespace Shared.Models
 {
-    public interface IMessage : INotification
+    public interface IMessage
     {
         public int? Id { get; set; }
         public long Author { get; set; }

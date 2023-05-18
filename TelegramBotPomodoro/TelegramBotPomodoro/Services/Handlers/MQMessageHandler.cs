@@ -1,24 +1,23 @@
 ﻿using MediatR;
 using Newtonsoft.Json;
-using Shared.Models;
+using Shared.Models.Requests;
 using Shared.Models.Telegram;
 
 namespace TelegramBotPomodoro.Services.Handlers
 {
-    internal class MQMessageHandler : INotificationHandler<MQMessage>
+    internal class MQMessageHandler : IRequestHandler<MQMessageHandleRequest, bool>
     {
-        private readonly IPublisher _publisher;
+        private readonly IMediator _mediator;
 
-        public MQMessageHandler(IPublisher publisher)
+        public MQMessageHandler(IMediator mediator)
         {
-            _publisher = publisher; 
+            _mediator = mediator; 
         }
 
-        public Task Handle(MQMessage message, CancellationToken cancellationToken)
+        public Task<bool> Handle(MQMessageHandleRequest message, CancellationToken cancellationToken)
         {
             var body = JsonConvert.DeserializeObject<Answer>(message.Body);
-            _publisher.Publish(body, cancellationToken);
-            return Task.CompletedTask;
+            return _mediator.Send<bool>(body, cancellationToken);
         }
     }
 }

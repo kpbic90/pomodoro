@@ -1,41 +1,41 @@
 ﻿using MediatR;
 using PomodoroService.Models;
 using PomodoroService.Models.Commands;
+using PomodoroService.Services.ButtonFactories;
 using Shared.Models.Telegram;
 using Shared.Services.Telegram;
 
 namespace PomodoroService.Services.Handlers
 {
-    internal class PlayCommandHandler : INotificationHandler<PlayCommand>
+    internal class PlayCommandHandler : IRequestHandler<PlayCommand, bool>
     {
         private readonly IAnswerSender _answerSender;
         private readonly IIntervalController _intervalController;
         private readonly IPomodoroConfig _config;
+        private readonly PauseButtonFactory _pauseButtonFactory;
 
-        public PlayCommandHandler(IAnswerSender answerSender, IIntervalController intervalController, IPomodoroConfig config)
+        public PlayCommandHandler(IAnswerSender answerSender, IIntervalController intervalController, IPomodoroConfig config, PauseButtonFactory pauseButtonFactory)
         {
             _answerSender = answerSender;
             _intervalController = intervalController;
             _config = config;
+            _pauseButtonFactory = pauseButtonFactory;
         }
 
-        public Task Handle(PlayCommand notification, CancellationToken cancellationToken)
+        public Task<bool> Handle(PlayCommand request, CancellationToken cancellationToken)
         {
-            _intervalController.StartInterval(notification.Message.Author, notification.Message.Id.Value, _config.DefaultIntervalLength, false);
-            var timeleft = _intervalController.GetInterval(notification.Message.Author)?.TimeSpan;
+            _intervalController.StartInterval(request.Message.Author, request.Message.Id.Value, _config.DefaultIntervalLength, false);
+            var timeleft = _intervalController.GetInterval(request.Message.Author)?.TimeSpan;
             var inlineButtons = new List<List<AnswerInlineButton>>
             {
                 new List<AnswerInlineButton>
                 {
-                    new AnswerInlineButton
-                    {
-                        Text = string.Format("Pause [{0:mm\\:ss}]", timeleft), CallbackData = "/pause"
-                    }
+                    (AnswerInlineButton)_pauseButtonFactory.CreateButton(timeleft)
                 }
             };
-            var answer = new Answer { Type = Shared.Enums.Telegram.AnswerType.EditMessage, EditMessageId = notification.Message.Id, Reciever = notification.Message.Author, Text = "Work until I say you to stop! Or you can pause for a while...", AnswerInlineButtons = inlineButtons };
+            var answer = new Answer { Type = Shared.Enums.Telegram.AnswerType.EditMessage, EditMessageId = request.Message.Id, Reciever = request.Message.Author, Text = "Work until I say you to stop! Or you can pause for a while...", AnswerInlineButtons = inlineButtons };
             _answerSender.SendMessage(answer);
-            return Task.CompletedTask;
+            return Task.FromResult( true );
         }
     }
 }

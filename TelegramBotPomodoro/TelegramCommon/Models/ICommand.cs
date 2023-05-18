@@ -1,9 +1,9 @@
 ﻿using MediatR;
 using Shared.Models;
 
-namespace PomodoroService.Models.Commands
+namespace TelegramCommon.Models
 {
-    internal interface ICommand : INotification
+    public interface ICommand : IRequest<bool>
     {
         IMessage Message { get; }
     }

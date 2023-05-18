@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using PomodoroService.Models.Notifications;
+using PomodoroService.Services.ButtonFactories;
 using Shared.Models.Telegram;
 using Shared.Services.Telegram;
 
@@ -8,16 +9,20 @@ namespace PomodoroService.Services.Handlers
     internal class IntervalUpdateHandler : INotificationHandler<IntervalUpdateNotification>
     {
         private readonly IAnswerSender _answerSender;
+        private readonly PauseButtonFactory _pauseButtonFactory;
+        private readonly RestButtonFactory _restButtonFactory;
 
-        public IntervalUpdateHandler(IAnswerSender answerSender)
+        public IntervalUpdateHandler(IAnswerSender answerSender, PauseButtonFactory pauseButtonFactory, RestButtonFactory restButtonFactory)
         {
             _answerSender = answerSender;
+            _pauseButtonFactory = pauseButtonFactory;
+            _restButtonFactory = restButtonFactory;
         }
 
         public Task Handle(IntervalUpdateNotification notification, CancellationToken cancellationToken)
         {
-            var button = notification.IsRest ? new AnswerInlineButton { Text = string.Format("Skip [{0:mm\\:ss}]", notification.TimeLeft), CallbackData = "/skip" } :
-                new AnswerInlineButton { Text = string.Format("Pause [{0:mm\\:ss}]", notification.TimeLeft), CallbackData = "/pause" };
+            var button = notification.IsRest ? (AnswerInlineButton)_restButtonFactory.CreateButton(notification.TimeLeft) :
+                (AnswerInlineButton)_pauseButtonFactory.CreateButton(notification.TimeLeft);
 
             var text = notification.IsRest ? "Rest for a while, or skip rest interval instantly" : "Work until I say you to stop! Or you can pause for a while...";
 

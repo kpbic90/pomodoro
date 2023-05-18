@@ -8,6 +8,7 @@ using Telegram.Bot;
 using Telegram.Bot.Types.ReplyMarkups;
 using Shared.Models;
 using Shared.Models.Telegram;
+using Shared.Models.Requests;
 
 namespace TelegramBotPomodoro.Services.Telegram
 {
@@ -16,13 +17,13 @@ namespace TelegramBotPomodoro.Services.Telegram
         private static TelegramBotClient? Bot;
         private readonly IMessengerConfigurationService _configurationService;
         private readonly ILogger<Worker> _logger;
-        private readonly IPublisher _publisher;
+        private readonly IMediator _mediator;
 
-        public TelegramService(ILogger<Worker> logger, IMessengerConfigurationService configurationService, IPublisher publisher)
+        public TelegramService(ILogger<Worker> logger, IMessengerConfigurationService configurationService, IMediator mediator)
         {
             _logger = logger;
             _configurationService = configurationService;
-            _publisher = publisher;
+            _mediator = mediator;
         }
 
 
@@ -41,7 +42,7 @@ namespace TelegramBotPomodoro.Services.Telegram
                 cts.Token);
         }
 
-        public async Task SendMessage(Answer message)
+        public async Task<bool> SendMessage(Answer message)
         {
             IReplyMarkup replyMarkup = null;
             if(message.AnswerInlineButtons?.Any() == true)
@@ -83,9 +84,10 @@ namespace TelegramBotPomodoro.Services.Telegram
             }
 
             await Bot.SendTextMessageAsync(message.Reciever, message.Text, replyMarkup: replyMarkup);
+            return true;
         }
 
-        public async Task EditMessage(Answer message)
+        public async Task<bool> EditMessage(Answer message)
         {
             InlineKeyboardMarkup replyMarkup = null;
             if (message.AnswerInlineButtons?.Any() == true)
@@ -106,11 +108,13 @@ namespace TelegramBotPomodoro.Services.Telegram
             }
 
             await Bot.EditMessageTextAsync(message.Reciever, message.EditMessageId.Value, message.Text, replyMarkup: replyMarkup);
+            return true;
         }
 
-        public async Task DeleteMessage(long authorId, int messageId)
+        public async Task<bool> DeleteMessage(long authorId, int messageId)
         {
             await Bot.DeleteMessageAsync(authorId, messageId);
+            return true;
         }
 
         private Task HandleErrorAsync(ITelegramBotClient botClient, Exception exception,
@@ -135,15 +139,15 @@ namespace TelegramBotPomodoro.Services.Telegram
                     switch(update.Message.Type)
                     {
                         case MessageType.Text:
-                            await _publisher.Publish(new Shared.Models.Message { Id = update.Message?.MessageId, Text = update.Message?.Text, Author = update.Message.From.Id, Receiver = update.Message.Chat.Id }, cancellationToken);
+                            await _mediator.Send(new MessageHandleRequest { Message = new Shared.Models.Message { Id = update.Message?.MessageId, Text = update.Message?.Text, Author = update.Message.From.Id, Receiver = update.Message.Chat.Id } }, cancellationToken);
                             break;
                         case MessageType.WebAppData:
-                            await _publisher.Publish(new Shared.Models.Message { Id = update.Message?.MessageId, Text = update.Message?.WebAppData?.Data, Author = update.Message.From.Id, Receiver = update.Message.Chat.Id }, cancellationToken);
+                            await _mediator.Send(new MessageHandleRequest { Message = new Shared.Models.Message { Id = update.Message?.MessageId, Text = update.Message?.WebAppData?.Data, Author = update.Message.From.Id, Receiver = update.Message.Chat.Id } }, cancellationToken);
                             break;
                     }
                     break;
                 case UpdateType.EditedMessage:
-                    await _publisher.Publish(new Shared.Models.Message { Id = update.Message?.MessageId, Text = update.EditedMessage?.Text, Author = update.Message.From.Id, Receiver = update.Message.Chat.Id }, cancellationToken);
+                    await _mediator.Send(new MessageHandleRequest { Message = new Shared.Models.Message { Id = update.Message?.MessageId, Text = update.EditedMessage?.Text, Author = update.Message.From.Id, Receiver = update.Message.Chat.Id } }, cancellationToken);
                     break;
                 case UpdateType.Unknown:
                     break;
@@ -152,7 +156,7 @@ namespace TelegramBotPomodoro.Services.Telegram
                 case UpdateType.ChosenInlineResult:
                     break;
                 case UpdateType.CallbackQuery:
-                    await _publisher.Publish(new Shared.Models.Message { Id = update.CallbackQuery.Message.MessageId, Text = update.CallbackQuery?.Data, Author = update.CallbackQuery.From.Id }, cancellationToken);
+                    await _mediator.Send(new MessageHandleRequest { Message = new Shared.Models.Message { Id = update.CallbackQuery.Message.MessageId, Text = update.CallbackQuery?.Data, Author = update.CallbackQuery.From.Id } }, cancellationToken);
                     break;
                 case UpdateType.ChannelPost:
                     break;

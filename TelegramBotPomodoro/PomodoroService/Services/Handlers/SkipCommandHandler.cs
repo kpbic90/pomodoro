@@ -5,7 +5,7 @@ using Shared.Services.Telegram;
 
 namespace PomodoroService.Services.Handlers
 {
-    internal class SkipCommandHandler : INotificationHandler<SkipCommand>
+    internal class SkipCommandHandler : IRequestHandler<SkipCommand, bool>
     {
         private readonly IAnswerSender _answerSender;
         private readonly IIntervalController _intervalController;
@@ -16,9 +16,9 @@ namespace PomodoroService.Services.Handlers
             _intervalController = intervalController;
         }
 
-        public Task Handle(SkipCommand notification, CancellationToken cancellationToken)
+        public Task<bool> Handle(SkipCommand request, CancellationToken cancellationToken)
         {
-            _intervalController.SkipInterval(notification.Message.Author);
+            _intervalController.SkipInterval(request.Message.Author);
             var inlineButtons = new List<List<AnswerInlineButton>>
             {
                 new List<AnswerInlineButton>
@@ -29,9 +29,9 @@ namespace PomodoroService.Services.Handlers
                     }
                 }
             };
-            var answerNew = new Answer { Type = Shared.Enums.Telegram.AnswerType.EditMessage, EditMessageId = notification.Message.Id, Reciever = notification.Message.Author, Text = "Rest skipped. Another work round?", AnswerInlineButtons = inlineButtons };
+            var answerNew = new Answer { Type = Shared.Enums.Telegram.AnswerType.EditMessage, EditMessageId = request.Message.Id, Reciever = request.Message.Author, Text = "Rest skipped. Another work round?", AnswerInlineButtons = inlineButtons };
             _answerSender.SendMessage(answerNew);
-            return Task.CompletedTask;
+            return Task.FromResult(true);
         }
     }
 }

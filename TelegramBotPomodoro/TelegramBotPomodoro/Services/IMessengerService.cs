@@ -10,8 +10,8 @@ namespace TelegramBotPomodoro.Services
         public event MessageRecivedHandler OnMessageRecieved;
 
         Task Init();
-        Task SendMessage(Answer message);
-        Task EditMessage(Answer message);
-        Task DeleteMessage(long authorId, int messageId);
+        Task<bool> SendMessage(Answer message);
+        Task<bool> EditMessage(Answer message);
+        Task<bool> DeleteMessage(long authorId, int messageId);
     }
 }

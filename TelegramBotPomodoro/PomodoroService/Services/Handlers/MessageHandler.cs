@@ -1,24 +1,27 @@
 ﻿using MediatR;
 using PomodoroService.Extensions;
-using Shared.Models;
+using Shared.Models.Requests;
 
 namespace PomodoroService.Services.Handlers
 {
-    internal class MessageHandler : INotificationHandler<Message>
+    internal class MessageHandler : IRequestHandler<MessageHandleRequest, bool>
     {
-        private readonly IPublisher _publisher;
+        private readonly IMediator _mediator;
 
-        public MessageHandler(IPublisher publisher)
+        public MessageHandler(IMediator mediator)
         {
-            _publisher = publisher;
+            _mediator = mediator;
         }
 
-        public async Task Handle(Message message, CancellationToken cancellationToken)
+        public Task<bool> Handle(MessageHandleRequest request, CancellationToken cancellationToken)
         {
-            var commandString = message.GetCommandString();
-            var command = commandString.GetCommand(message);
+            var commandString = request.Message.GetCommandString();
+            var command = commandString.GetCommand(request.Message);
             if (command != null)
-                await _publisher.Publish(command, cancellationToken);
+                return _mediator.Send(command, cancellationToken);
+
+            // cant find command - drop it from queue
+            return Task.FromResult( true );
         }
     }
 }

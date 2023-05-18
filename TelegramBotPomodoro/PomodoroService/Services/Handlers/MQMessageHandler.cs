@@ -1,23 +1,23 @@
 ﻿using MediatR;
 using Newtonsoft.Json;
 using Shared.Models;
+using Shared.Models.Requests;
 
 namespace PomodoroService.Services.Handlers
 {
-    internal class MQMessageHandler : INotificationHandler<MQMessage>
+    internal class MQMessageHandler : IRequestHandler<MQMessageHandleRequest, bool>
     {
-        private readonly IPublisher _publisher;
+        private readonly IMediator _mediator;
 
-        public MQMessageHandler(IPublisher publisher)
+        public MQMessageHandler(IMediator mediator)
         {
-            _publisher = publisher; 
+            _mediator = mediator; 
         }
 
-        public Task Handle(MQMessage message, CancellationToken cancellationToken)
+        public Task<bool> Handle(MQMessageHandleRequest request, CancellationToken cancellationToken)
         {
-            var body = JsonConvert.DeserializeObject<Message>(message.Body);
-            _publisher.Publish(body, cancellationToken);
-            return Task.CompletedTask;
+            var body = JsonConvert.DeserializeObject<Message>(request.Body);
+            return _mediator.Send<bool>(new MessageHandleRequest { Message = body }, cancellationToken);
         }
     }
 }

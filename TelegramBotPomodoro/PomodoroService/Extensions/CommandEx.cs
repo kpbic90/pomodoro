@@ -1,5 +1,6 @@
 ﻿using PomodoroService.Models.Commands;
 using Shared.Models;
+using TelegramCommon.Models;
 
 namespace PomodoroService.Extensions
 {

@@ -27,7 +27,7 @@ namespace TelegramBotPomodoro.Services
         public async Task StartAsync(CancellationToken cancellationToken)
         {
             await _messangerService.Init();
-            _iMQService.StartConsuming(_iConfig.RabbitQueue);
+            _iMQService.StartConsuming(_iConfig.RabbitQueue, false);
         }
 
         public Task StopAsync(CancellationToken cancellationToken)

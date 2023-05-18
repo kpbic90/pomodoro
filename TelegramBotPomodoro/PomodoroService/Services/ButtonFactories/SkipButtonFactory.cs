@@ -1,0 +1,17 @@
+﻿using Shared.Models.Telegram;
+using TelegramCommon.Services.ButtonFactories;
+
+namespace PomodoroService.Services.ButtonFactories
+{
+    internal class SkipButtonFactory : IButtonFactory
+    {
+        public IAnswerButton CreateButton(params object[] args)
+        {
+            return new AnswerInlineButton
+            {
+                Text = string.Format("Skip [{0:mm\\:ss}]", args),
+                CallbackData = "/skip"
+            };
+        }
+    }
+}

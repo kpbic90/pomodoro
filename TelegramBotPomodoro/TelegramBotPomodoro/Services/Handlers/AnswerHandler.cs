@@ -3,7 +3,7 @@ using Shared.Models.Telegram;
 
 namespace TelegramBotPomodoro.Services.Handlers
 {
-    internal class AnswerHandler : INotificationHandler<Answer>
+    internal class AnswerHandler : IRequestHandler<Answer, bool>
     {
         private readonly IMessengerService _messangerService;
 
@@ -12,22 +12,23 @@ namespace TelegramBotPomodoro.Services.Handlers
             _messangerService = messangerService;
         }
 
-        public Task Handle(Answer answer, CancellationToken cancellationToken)
+        public async Task<bool> Handle(Answer answer, CancellationToken cancellationToken)
         {
+            var result = false;
             switch(answer.Type)
             {
                 case Shared.Enums.Telegram.AnswerType.DeleteMessage:
-                    _messangerService.DeleteMessage(answer.Reciever.Value, answer.EditMessageId.Value);
+                    result = await _messangerService.DeleteMessage(answer.Reciever.Value, answer.EditMessageId.Value);
                     break;
                 case Shared.Enums.Telegram.AnswerType.NewMessage:
-                    _messangerService.SendMessage(answer);
+                    result = await _messangerService.SendMessage(answer);
                     break;
                 case Shared.Enums.Telegram.AnswerType.EditMessage:
-                    _messangerService.EditMessage(answer);
+                    result = await _messangerService.EditMessage(answer);
                     break;
             }
 
-            return Task.CompletedTask;
+            return result;
         }
     }
 }

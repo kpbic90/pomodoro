@@ -1,4 +1,5 @@
 ﻿using Shared.Models;
+using TelegramCommon.Models;
 
 namespace PomodoroService.Models.Commands
 {

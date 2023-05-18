@@ -24,7 +24,7 @@ namespace PomodoroService.Services
 
         public async Task StartAsync(CancellationToken cancellationToken)
         {
-            _iMQService.StartConsuming(_iConfig.RabbitQueue);
+            _iMQService.StartConsuming(_iConfig.RabbitQueue, false);
         }
 
         public Task StopAsync(CancellationToken cancellationToken)

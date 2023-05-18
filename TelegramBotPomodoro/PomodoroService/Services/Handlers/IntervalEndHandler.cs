@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using PomodoroService.Models.Notifications;
+using PomodoroService.Services.ButtonFactories;
 using Shared.Models.Telegram;
 using Shared.Services.Telegram;
 
@@ -8,10 +9,14 @@ namespace PomodoroService.Services.Handlers
     internal class IntervalEndHandler : INotificationHandler<IntervalEndNotification>
     {
         private readonly IAnswerSender _answerSender;
+        private readonly PlayButtonFactory _playButtonFactory;
+        private readonly RestButtonFactory _restButtonFactory;
 
-        public IntervalEndHandler(IAnswerSender answerSender)
+        public IntervalEndHandler(IAnswerSender answerSender, PlayButtonFactory playButtonFactory, RestButtonFactory restButtonFactory)
         {
             _answerSender = answerSender;
+            _playButtonFactory = playButtonFactory;
+            _restButtonFactory = restButtonFactory;
         }
 
         public Task Handle(IntervalEndNotification notification, CancellationToken cancellationToken)
@@ -23,20 +28,14 @@ namespace PomodoroService.Services.Handlers
             {
                 new List<AnswerInlineButton>
                 {
-                    new AnswerInlineButton
-                    {
-                        Text = "Start Working!", CallbackData = "/play"
-                    }
+                    (AnswerInlineButton)_playButtonFactory.CreateButton()
                 }
             };
             if(!notification.IsRest)
             {
                 inlineButtons.Add(new List<AnswerInlineButton>
                 {
-                    new AnswerInlineButton
-                    {
-                        Text = "Rest", CallbackData = "/rest"
-                    }
+                    (AnswerInlineButton)_restButtonFactory.CreateButton()
                 });
             }
             var text = notification.IsRest ? "Time to get back to work!" : "Well done! Another round? Or rest for short period";
